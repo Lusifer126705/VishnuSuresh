@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vishnu Suresh | AR/VR & Automation Developer</title>
+  
+  <!-- SMOOTH SCROLL LIBRARY (LENIS) -->
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  
+  <style>
+    /* --- THEME VARIABLES --- */
+    :root {
+      --bg: #030305;
+      --accent: #00f2ff;
+      --secondary: #7000ff;
+      --text: #e0e0e0;
+      --glass: rgba(255, 255, 255, 0.05); 
+      --border: rgba(0, 242, 255, 0.2);
+      --radius-lg: 30px;
+    }
+
+    /* --- GLOBAL RESET --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html.lenis { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    
+    body {
+      background: linear-gradient(rgba(3, 3, 5, 0.8), rgba(3, 3, 5, 0.8)), url('BG.png'); 
+      background-size: cover;
+      background-position: center 50px; 
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    nav, .sidebar, .hero, .section, footer { position: relative; z-index: 10; }
+
+    /* --- NAVIGATION --- */
+    nav {
+      position: fixed;
+      top: 0; width: 100%; padding: 30px 50px;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(to bottom, rgba(3,3,5,0.7), transparent);
+      backdrop-filter: blur(10px);
+    }
+    .nav-left { display: flex; align-items: center; gap: 25px; }
+    .menu-toggle {
+      width: 25px; height: 16px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      cursor: pointer; z-index: 1001;
+    }
+    .menu-toggle span { display: block; width: 100%; height: 2px; background: var(--accent); border-radius: 2px; }
+    .logo { font-weight: 900; letter-spacing: 5px; color: #fff; font-size: 12px; text-transform: uppercase; }
+    .logo span { color: var(--accent); }
+    nav ul { display: flex; list-style: none; gap: 40px; }
+    nav a { color: #fff; text-decoration: none; text-transform: uppercase; font-size: 10px; letter-spacing: 3px; opacity: 0.6; transition: 0.3s; }
+    nav a:hover { opacity: 1; color: var(--accent); }
+
+    /* --- SIDEBAR & PROFILE IMAGE FIX --- */
+    .sidebar {
+      position: fixed;
+      top: 0; left: -25%; 
+      width: 25%; height: 100vh;
+      background: var(--glass);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      z-index: 1000;
+      border-right: 1px solid var(--border);
+      padding: 120px 40px;
+      transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .sidebar.active { left: 0; }
+    .sidebar-close { position: absolute; top: 40px; right: 30px; font-size: 24px; color: var(--accent); cursor: pointer; background: none; border: none; }
+    
+    /* MODIFIED FOR MAXIMUM CLARITY */
+    .profile-img { 
+      width: 120px; 
+      height: 120px; 
+      border-radius: 50%; 
+      border: 2px solid var(--accent); 
+      margin-bottom: 25px; 
+      background: rgba(255,255,255,0.1); 
+      object-fit: cover; 
+      /* Sharpening Properties */
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      transform: translateZ(0); 
+      backface-visibility: hidden;
+      filter: none; /* Removes any accidental blurring filters */
+    }
+
+    .sidebar h2 { font-size: 1.2rem; color: #fff; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
+    .sidebar p { font-size: 0.85rem; opacity: 0.7; font-weight: 300; line-height: 1.6; }
+    .sidebar .detail-label { color: var(--accent); font-size: 9px; text-transform: uppercase; margin-top: 30px; letter-spacing: 2px; }
+
+    /* --- HERO --- */
+    .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10%; }
+    .hero-pre { font-size: 10px; letter-spacing: 10px; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; display: block; }
+    .hero h1 {
+      font-size: clamp(2.5rem, 8vw, 5.5rem); line-height: 0.9; font-weight: 800; text-transform: uppercase;
+      background: linear-gradient(to right, #fff 20%, var(--accent) 50%, var(--secondary) 80%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { max-width: 800px; margin-top: 30px; font-size: 1.1rem; opacity: 0.6; border-left: 2px solid var(--secondary); padding-left: 20px; }
+
+    /* --- GENERAL SECTION STYLES --- */
+    .section { padding: 100px 10%; opacity: 0; transform: translateY(30px); transition: 1s ease-out; }
+    .section.visible { opacity: 1; transform: translateY(0); }
+    .section-header { margin-bottom: 60px; }
+    .section-header h2 { font-size: 2rem; letter-spacing: 5px; text-transform: uppercase; color: #fff; }
+    .section-header .line { width: 60px; height: 4px; background: var(--accent); margin-top: 10px; border-radius: 2px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+    /* --- EXPERTISE VIDEO CARDS --- */
+    .card {
+      position: relative;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      text-decoration: none; color: inherit; overflow: hidden;
+      min-height: 350px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .card-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.6; transition: 0.5s ease; }
+    .card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 70%); z-index: 0; }
+    .card-content { position: relative; z-index: 1; }
+    .card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--accent); }
+    .card:hover .card-video { opacity: 1; }
+    .card .tag { font-size: 9px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 15px; display: block; }
+    .card h3 { font-size: 1.5rem; margin-bottom: 15px; color: #fff; font-weight: 600; }
+    .card p { font-size: 0.9rem; opacity: 0.6; font-weight: 300; }
+
+    /* --- WORK GRID --- */
+    .work-item {
+      height: 380px;
+      border-radius: var(--radius-lg);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .work-item:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 30px rgba(0, 242, 255, 0.1); }
+    .work-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(3,3,5,1) 5%, rgba(3,3,5,0) 60%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 35px;
+    }
+
+    /* --- PROJECT MODAL --- */
+    .modal {
+      position: fixed; inset: 0; 
+      background: rgba(3, 3, 5, 0.95);
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: 0.4s ease; 
+      padding: 40px 5%; 
+    }
+    .modal.active { opacity: 1; pointer-events: all; }
+    
+    .modal-card {
+      background: #0a0a0c;
+      width: 100%; max-width: 800px; 
+      height: 80vh; 
+      border-radius: 40px;
+      border: 1px solid var(--accent); 
+      box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+      overflow-y: scroll; 
+      transform: scale(0.9) translateY(30px); 
+      opacity: 0;
+      transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+      position: relative;
+      scrollbar-width: none; 
+    }
+    .modal-card::-webkit-scrollbar { display: none; }
+
+    .modal.active .modal-card { transform: scale(1) translateY(0); opacity: 1; }
+
+    .modal-viewport {
+        min-height: 100%; width: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        padding: 50px; position: relative;
+    }
+
+    .modal-video-box { 
+        width: 85%; aspect-ratio: 16/9; background: #000; 
+        margin: 0 auto 30px; border-radius: 20px; overflow: hidden;
+        border: 1px solid var(--border);
+    }
+    .modal-video-box video { width: 100%; height: 100%; object-fit: cover; }
+    
+    .modal-info-main { text-align: center; }
+    .modal-info-main h2 { font-size: 2.2rem; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+    .modal-info-main p { opacity: 0.6; font-size: 1.1rem; }
+
+
+    .skills-box {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill {
+  padding: 8px 14px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.skill:hover {
+  background: #00bcd4;
+  color: #000;
+  cursor: pointer;
+}
+    .nav-arrow {
+        position: absolute; left: 50%; transform: translateX(-50%);
+        cursor: pointer; background: none; border: none; transition: 0.3s; z-index: 10;
+    }
+    .nav-arrow svg { width: 35px; height: 35px; fill: var(--accent); opacity: 0.5; transition: 0.3s; }
+    .nav-arrow:hover svg { opacity: 1; transform: scale(1.2); }
+    .arrow-down { bottom: 30px; animation: pulseDown 2s infinite; }
+    .arrow-up { top: 30px; }
+
+    @keyframes pulseDown {
+        0%, 100% { transform: translate(-50%, 0); }
+        50% { transform: translate(-50%, 10px); }
+    }
+
+    .modal-long-desc { border-top: 1px solid var(--border); background: #070709; }
+    .modal-long-desc h3 { color: var(--accent); margin-bottom: 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 4px; }
+    .modal-long-desc p { font-size: 1.1rem; line-height: 1.8; opacity: 0.8; font-weight: 300; }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; border-top: 1px solid var(--border); padding-top: 30px; margin-top: 30px;}
+    .detail-item h4 { color: var(--accent); font-size: 9px; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
+    .detail-item p { font-size: 0.9rem; opacity: 0.6; }
+
+    .modal-close-btn {
+        position: fixed; top: 30px; right: 30px; width: 50px; height: 50px;
+        background: var(--glass); border: 1px solid var(--border); color: #fff;
+        border-radius: 50%; font-size: 25px; cursor: pointer; display: flex; 
+        align-items: center; justify-content: center; transition: 0.3s; z-index: 2001;
+        backdrop-filter: blur(10px);
+    }
+    .modal-close-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    /* --- CONTACT --- */
+    .contact-wrap { display: flex; justify-content: center; gap: 25px; margin-top: 50px; flex-wrap: wrap; }
+    .contact-icon {
+      width: 85px; height: 85px; display: flex; align-items: center; justify-content: center;
+      background: var(--glass); border: 1px solid var(--border); border-radius: 50%;
+      backdrop-filter: blur(20px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
+    }
+    .contact-icon svg { width: 30px; height: 30px; fill: none; stroke: var(--accent); stroke-width: 1.5; transition: 0.3s; }
+    .contact-icon:hover { transform: scale(1.2) rotate(5deg); border-color: var(--accent); background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
+    .contact-icon:hover svg { stroke: #fff; filter: drop-shadow(0 0 8px var(--accent)); }
+
+    /* --- FOOTER --- */
+    footer { padding: 80px 10% 40px; display: flex; justify-content: space-between; opacity: 0.4; font-size: 10px; border-top: 1px solid var(--border); text-transform: uppercase; letter-spacing: 2px; }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px; }
+      nav ul { display: none; }
+      .sidebar { width: 85%; left: -85%; }
+      .hero h1 { font-size: 3rem; }
+      .section { padding: 60px 5%; }
+      .grid { grid-template-columns: 1fr; }
+      body { background-position: center center; background-attachment: scroll; }
+      .modal-card { width: 95%; height: 85vh; }
+      .modal-viewport { padding: 30px; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div id="sidebar" class="sidebar">
+    <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+    <!-- Sharp Profile Image -->
+    <img src="Pic.png" alt="Vishnu Suresh" class="profile-img">
+    <h2>Vishnu Suresh</h2>
+    <p>AR/VR Developer & Automation Engineer based in India.</p>
+    <div class="detail-label">Location</div><p>Kerala, India</p>
+    <div class="detail-label">Status</div><p>System Online</p>
+  </div>
+
+  <nav>
+    <div class="nav-left">
+      <div class="menu-toggle" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="logo">VISHNU <span>SURESH</span></div>
+    </div>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#expertise">Expertise</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section id="about" class="hero">
+    <span class="hero-pre">Unity Developer Focused on</span>
+    <h1>Building<br>Virtual<br>Intelligence</h1>
+    <p>Merging the boundaries of Unity with Artificial Intelligence.
+    I specialize in developing high-performance, non-gaming Unity applications tailored for engineering domains. My work focuses on building scalable digital twin systems, immersive AR/VR experiences, and real-time simulation environments that replicate complex physical systems with precision. I integrate AI-driven backends for predictive analytics, intelligent interactions, and data-driven decision-making, ensuring seamless communication between virtual and real-world systems.</p>
+  </section>
+
+  <section id="expertise" class="section">
+  <div class="section-header">
+    <h2>Expertise</h2>
+    <div class="line"></div>
+  </div>
+
+  <!-- Main Expertise Cards -->
+  <div class="grid">
+    <div class="card">
+      <video class="card-video" autoplay muted loop playsinline>
+        <source src="video1.mp4" type="video/mp4">
+      </video>
+      <div class="card-content">
+        <span class="tag">Interface</span>
+        <h3>Unity</h3>
+        <p>Designing high-performance Unity environments focused on simulations, AI backend integration, and scalable digital twin systems.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <video class="card-video" autoplay muted loop playsinline>
+        <source src="video2.mp4" type="video/mp4">
+      </video>
+      <div class="card-content">
+        <span class="tag">Cinematic Animation</span>
+        <h3>Blender</h3>
+        <p>Demonstrating expertise in 3D content creation and animation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Expertise (Small Boxes) -->
+  <div class="skills-box">
+    <span class="skill">Omniverse</span>
+    <span class="skill">Python</span>
+    <span class="skill">AI Integration</span>
+    <span class="skill">Digital Twin</span>
+    <span class="skill">Simulation Systems</span>
+  </div>
+
+</section>
+
+  <section id="work" class="section">
+    <div class="section-header">
+      <h2>Work</h2>
+      <div class="line"></div>
+    </div>
+    <div class="grid">
+      <div class="work-item" style="background-image: url('BG1.png');" onclick="openModal('OctaCopter', 'Digital Twin with VR experience.', 'video1.mp4', 'Unity, MQTT, C#', '6 Months')">
+        <div class="work-overlay"><span class="tag">0x01</span><h3 style="color: #fff;">Octacopter simulator</h3></div>
+      </div>
+      <div class="work-item" style="background-image: url('BG2.png');" onclick="openModal('Remote Assist', 'AR-based maintenance guide for high-voltage systems.', 'v3.mp4', 'Unreal Engine, Meta SDK', '4 Months')">
+        <div class="work-overlay"><span class="tag">0x02</span><h3 style="color: #fff;">Remote Assist</h3></div>
+      </div>
+      <div class="work-item" style="background-image: url('BG3.png');" onclick="openModal('Robotic Cell', 'Virtual environment to test robotic kinematics and pathfinding.', 'v6.mp4', 'Python, ROS, Unity', '3 Months')">
+        <div class="work-overlay"><span class="tag">0x03</span><h3 style="color: #fff;">Kinematic Sim</h3></div>
+      </div>
+      <div class="work-item" style="background-image: url('BG4.png');" onclick="openModal('Logistic Vision', 'VR warehouse management system with real-time API sync.', 'v5.mp4', 'Three.js, Blender', '5 Months')">
+        <div class="work-overlay"><span class="tag">0x04</span><h3 style="color: #fff;">Smart Logistics</h3></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="projectModal" class="modal" onclick="closeModalOutside(event)">
+    <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+    <div class="modal-card" id="modalCard">
+      <div class="modal-viewport" id="viewport1">
+          <div class="modal-video-box"><video id="modalVideo" loop muted playsinline></video></div>
+          <div class="modal-info-main"><h2 id="modalTitle">Project Title</h2><p id="modalDesc">Short Overview</p></div>
+          <button class="nav-arrow arrow-down" onclick="scrollModalTo('viewport2')">
+              <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </button>
+      </div>
+      <div class="modal-viewport modal-long-desc" id="viewport2">
+          <button class="nav-arrow arrow-up" onclick="scrollModalTo('viewport1')">
+              <svg viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </button>
+          <h3>Project Insight</h3>
+          <p>This implementation focused on cross-platform compatibility and high-fidelity physics. By simulating industrial workflows in a virtual environment, we reduced operator error by 25%.</p>
+          <div class="detail-grid">
+              <div class="detail-item"><h4>Technologies</h4><p id="modalTech">Stack details...</p></div>
+              <div class="detail-item"><h4>Timeline</h4><p id="modalDuration">Timeline details...</p></div>
+              <div class="detail-item"><h4>Status</h4><p>Deployment Ready</p></div>
+              <div class="detail-item"><h4>Role</h4><p>Lead Developer</p></div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="contact" class="section" style="text-align: center;">
+    <span class="hero-pre">Ready for Deployment?</span>
+    <h2 style="font-size: 2.5rem; margin-top: 20px; text-transform: uppercase;">Connect</h2>
+    <div class="contact-wrap">
+      <a href="mailto:vishnusuresh0521@gmail.com" class="contact-icon" title="Email">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/vishnu-suresh-859978202" target="_blank" class="contact-icon" title="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2024 VISHNU SURESH</div>
+    <div>PORTFOLIO_OS // BUILD 2024.1</div>
+  </footer>
+
+  <script>
+    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
+    document.querySelectorAll('nav a, .sidebar a').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        document.getElementById('sidebar').classList.remove('active');
+        lenis.scrollTo(targetId, { duration: 1.5 });
+      });
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+    const modal = document.getElementById('projectModal');
+    const mCard = document.getElementById('modalCard');
+    const mVideo = document.getElementById('modalVideo');
+    function openModal(title, desc, videoSrc, tech, duration) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalDesc').innerText = desc;
+        document.getElementById('modalTech').innerText = tech;
+        document.getElementById('modalDuration').innerText = duration;
+        mVideo.src = videoSrc;
+        mCard.scrollTop = 0; 
+        modal.classList.add('active');
+        mVideo.play();
+        lenis.stop(); 
+    }
+    function closeModal() { modal.classList.remove('active'); mVideo.pause(); lenis.start(); }
+    function scrollModalTo(id) { const target = document.getElementById(id); mCard.scrollTo({ top: target.offsetTop, behavior: 'smooth' }); }
+    function closeModalOutside(event) { if (event.target === modal) closeModal(); }
+
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5;
+      }
+      update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); }
+      draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 242, 255, 0.4)'; ctx.fill(); }
+    }
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.update(); p.draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = p.x - particles[j].x; const dy = p.y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 180) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 242, 255, ${1 - dist/180})`;
+            ctx.lineWidth = 0.5; ctx.moveTo(p.x, p.y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section').forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>
