@@ -16,7 +16,7 @@
       --secondary: #7000ff;
       --text: #e0e0e0;
       --glass: rgba(255, 255, 255, 0.05); 
-      --border: rgba(0, 242, 255, 0.2);
+      --border: rgba(3, 174, 183, 0.719);
       --radius-lg: 30px;
     }
 
@@ -121,11 +121,37 @@
     .section-header .line { width: 60px; height: 4px; background: var(--accent); margin-top: 10px; border-radius: 2px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
 
+    .work-item {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Create the tint layer */
+.work-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Adjust the percentages to make the tint heavier or lighter */
+  background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none; /* Allows the click to still hit the work-item */
+  z-index: 1;
+}
+
+/* Ensure your text/overlay stays on top of the tint */
+.work-overlay {
+  position: relative;
+  z-index: 2;
+}
+
     /* --- EXPERTISE VIDEO CARDS --- */
     .card {
       position: relative;
       background: var(--glass);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       padding: 40px;
       border-radius: var(--radius-lg);
       backdrop-filter: blur(20px); 
@@ -153,16 +179,23 @@
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     }
     .work-item:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 30px rgba(0, 242, 255, 0.1); }
-    .work-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(3,3,5,1) 5%, rgba(3,3,5,0) 60%);
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 35px;
-    }
+   .work-overlay {
+  position: absolute; 
+  inset: 0;
+  /* Existing linear gradient PLUS an inset box shadow for the borders */
+  background: linear-gradient(to top, rgba(3,3,5,1) 10%, rgba(3,3,5,0) 60%);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9); 
+  
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-end;
+  padding: 30px;
+  transition: all 0.3s ease; /* Optional: makes hover effects smoother */
+}
 
     /* --- PROJECT MODAL --- */
     .modal {
@@ -220,7 +253,7 @@
 
 .skill {
   padding: 8px 14px;
-  background: #1e1e1e;
+  background: #025874;
   border: 1px solid #333;
   border-radius: 20px;
   font-size: 14px;
@@ -302,9 +335,9 @@
     <!-- Sharp Profile Image -->
     <img src="Pic.png" alt="Vishnu Suresh" class="profile-img">
     <h2>Vishnu Suresh</h2>
-    <p>AR/VR Developer & Automation Engineer based in India.</p>
-    <div class="detail-label">Location</div><p>Kerala, India</p>
-    <div class="detail-label">Status</div><p>System Online</p>
+    <p>Unity Developer</p>
+    <div class="detail-label">Location</div><p>Bangalore, India</p>
+    <div class="detail-label">Status</div><p>Open to work</p>
   </div>
 
   <nav>
@@ -317,7 +350,7 @@
     <ul>
       <li><a href="#about">About</a></li>
       <li><a href="#expertise">Expertise</a></li>
-      <li><a href="#work">Work</a></li>
+      <li><a href="#projects">Projects</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -371,52 +404,71 @@
 
 </section>
 
-  <section id="work" class="section">
-    <div class="section-header">
-      <h2>Work</h2>
-      <div class="line"></div>
+  <section id="projects" class="section">
+  <div class="section-header">
+    <h2>Projects</h2>
+    <div class="line"></div>
+  </div>
+  <div class="grid">
+    <!-- Card 01 -->
+    <div class="work-item" style="background-image: url('BG1.png');" 
+         onclick="openModal('Octacopter Simulator', 'Digital Twin with VR experience.', 'video1.mp4', 'Unity, MQTT, C#', '6 Months', 'This project involved creating a high-fidelity physics model for flight simulation. We integrated real-time MQTT data to synchronize the virtual twin with a physical drone.')">
+      <div class="work-overlay"><span class="tag">01</span><h3 style="color: #fff;">Octacopter simulator</h3></div>
     </div>
-    <div class="grid">
-      <div class="work-item" style="background-image: url('BG1.png');" onclick="openModal('OctaCopter', 'Digital Twin with VR experience.', 'video1.mp4', 'Unity, MQTT, C#', '6 Months')">
-        <div class="work-overlay"><span class="tag">0x01</span><h3 style="color: #fff;">Octacopter simulator</h3></div>
-      </div>
-      <div class="work-item" style="background-image: url('BG2.png');" onclick="openModal('Remote Assist', 'AR-based maintenance guide for high-voltage systems.', 'v3.mp4', 'Unreal Engine, Meta SDK', '4 Months')">
-        <div class="work-overlay"><span class="tag">0x02</span><h3 style="color: #fff;">Remote Assist</h3></div>
-      </div>
-      <div class="work-item" style="background-image: url('BG3.png');" onclick="openModal('Robotic Cell', 'Virtual environment to test robotic kinematics and pathfinding.', 'v6.mp4', 'Python, ROS, Unity', '3 Months')">
-        <div class="work-overlay"><span class="tag">0x03</span><h3 style="color: #fff;">Kinematic Sim</h3></div>
-      </div>
-      <div class="work-item" style="background-image: url('BG4.png');" onclick="openModal('Logistic Vision', 'VR warehouse management system with real-time API sync.', 'v5.mp4', 'Three.js, Blender', '5 Months')">
-        <div class="work-overlay"><span class="tag">0x04</span><h3 style="color: #fff;">Smart Logistics</h3></div>
-      </div>
-    </div>
-  </section>
 
-  <div id="projectModal" class="modal" onclick="closeModalOutside(event)">
-    <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-    <div class="modal-card" id="modalCard">
-      <div class="modal-viewport" id="viewport1">
-          <div class="modal-video-box"><video id="modalVideo" loop muted playsinline></video></div>
-          <div class="modal-info-main"><h2 id="modalTitle">Project Title</h2><p id="modalDesc">Short Overview</p></div>
-          <button class="nav-arrow arrow-down" onclick="scrollModalTo('viewport2')">
-              <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-          </button>
+    <!-- Card 02 -->
+    <div class="work-item" style="background-image: url('BG2.png');" 
+         onclick="openModal('VR for School', 'Immersive biology education.', 'v3.mp4', 'Unreal Engine, Meta SDK', '4 Months', 'We developed a microscopic journey through an animal cell. Students can interact with organelles, helping to increase engagement by 40% compared to traditional textbooks.')">
+      <div class="work-overlay"><span class="tag">02</span><h3 style="color: #fff;">VR for school</h3></div>
+    </div>
+
+    <!-- Card 03 -->
+    <div class="work-item" style="background-image: url('BG3.png');" 
+         onclick="openModal('Server Room Digital Twin', 'Virtual environment for robotic pathfinding.', 'v6.mp4', 'Python, ROS, Unity', '3 Months', 'This simulation uses ROS to test autonomous robots within a server room environment, allowing for stress-testing pathfinding algorithms without risking physical hardware.')">
+      <div class="work-overlay"><span class="tag">03</span><h3 style="color: #fff;">Server Room Digital Twin</h3></div>
+    </div>
+
+    <!-- Card 04 -->
+    <div class="work-item" style="background-image: url('BG4.png');" 
+         onclick="openModal('Server Rack Digital Twin', 'VR warehouse management system.', 'v5.mp4', 'Three.js, Blender', '5 Months', 'A real-time data visualization tool for IT infrastructure. It syncs with server APIs to show temperature and CPU load as visual effects directly on the virtual racks.')">
+      <div class="work-overlay"><span class="tag">04</span><h3 style="color: #fff;">Server Rack Digital Twin</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Structure -->
+<div id="projectModal" class="modal" onclick="closeModalOutside(event)">
+  <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+  <div class="modal-card" id="modalCard">
+    <!-- Viewport 1: Intro -->
+    <div class="modal-viewport" id="viewport1">
+      <div class="modal-video-box"><video id="modalVideo" loop muted playsinline></video></div>
+      <div class="modal-info-main">
+        <h2 id="modalTitle">Project Title</h2>
+        <p id="modalDesc">Short Overview</p>
       </div>
-      <div class="modal-viewport modal-long-desc" id="viewport2">
-          <button class="nav-arrow arrow-up" onclick="scrollModalTo('viewport1')">
-              <svg viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-          </button>
-          <h3>Project Insight</h3>
-          <p>This implementation focused on cross-platform compatibility and high-fidelity physics. By simulating industrial workflows in a virtual environment, we reduced operator error by 25%.</p>
-          <div class="detail-grid">
-              <div class="detail-item"><h4>Technologies</h4><p id="modalTech">Stack details...</p></div>
-              <div class="detail-item"><h4>Timeline</h4><p id="modalDuration">Timeline details...</p></div>
-              <div class="detail-item"><h4>Status</h4><p>Deployment Ready</p></div>
-              <div class="detail-item"><h4>Role</h4><p>Lead Developer</p></div>
-          </div>
+      <button class="nav-arrow arrow-down" onclick="scrollModalTo('viewport2')">
+        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
+    </div>
+
+    <!-- Viewport 2: Details -->
+    <div class="modal-viewport modal-long-desc" id="viewport2">
+      <button class="nav-arrow arrow-up" onclick="scrollModalTo('viewport1')">
+        <svg viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
+      <h3>Project Insight</h3>
+      <p id="modalInsight">Detailed insight text will appear here...</p> <!-- UNIQUE TEXT GOES HERE -->
+      
+      <div class="detail-grid">
+        <div class="detail-item"><h4>Technologies</h4><p id="modalTech">Stack details...</p></div>
+        <div class="detail-item"><h4>Hardware Used</h4><p id="modalDuration">Timeline details...</p></div>
+        <div class="detail-item"><h4>Status</h4><p>Deployment Ready</p></div>
+        <div class="detail-item"><h4>Role</h4><p>Lead Developer</p></div>
       </div>
     </div>
   </div>
+</div>
 
   <section id="contact" class="section" style="text-align: center;">
     <span class="hero-pre">Ready for Deployment?</span>
@@ -455,20 +507,44 @@
     const modal = document.getElementById('projectModal');
     const mCard = document.getElementById('modalCard');
     const mVideo = document.getElementById('modalVideo');
-    function openModal(title, desc, videoSrc, tech, duration) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalDesc').innerText = desc;
-        document.getElementById('modalTech').innerText = tech;
-        document.getElementById('modalDuration').innerText = duration;
-        mVideo.src = videoSrc;
-        mCard.scrollTop = 0; 
-        modal.classList.add('active');
-        mVideo.play();
-        lenis.stop(); 
+    function openModal(title, desc, videoSrc, tech, duration, insight) {
+    // Basic Info
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalDesc').innerText = desc;
+    document.getElementById('modalTech').innerText = tech;
+    document.getElementById('modalDuration').innerText = duration;
+    
+    // Update the unique Project Insight text
+    // Make sure your HTML <p> tag has id="modalInsight"
+    const insightElement = document.getElementById('modalInsight');
+    if (insightElement) {
+        insightElement.innerText = insight;
     }
-    function closeModal() { modal.classList.remove('active'); mVideo.pause(); lenis.start(); }
-    function scrollModalTo(id) { const target = document.getElementById(id); mCard.scrollTo({ top: target.offsetTop, behavior: 'smooth' }); }
-    function closeModalOutside(event) { if (event.target === modal) closeModal(); }
+
+    // Video and UI logic
+    mVideo.src = videoSrc;
+    mCard.scrollTop = 0; 
+    modal.classList.add('active');
+    mVideo.play();
+    
+    // Stop background scrolling (Lenis)
+    if (typeof lenis !== 'undefined') lenis.stop(); 
+}
+
+function closeModal() { 
+    modal.classList.remove('active'); 
+    mVideo.pause(); 
+    if (typeof lenis !== 'undefined') lenis.start(); 
+}
+
+function scrollModalTo(id) { 
+    const target = document.getElementById(id); 
+    mCard.scrollTo({ top: target.offsetTop, behavior: 'smooth' }); 
+}
+
+function closeModalOutside(event) { 
+    if (event.target === modal) closeModal(); 
+}
 
   
 
